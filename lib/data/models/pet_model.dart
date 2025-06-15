@@ -6,7 +6,7 @@ class PetModel extends Pet {
   PetModel({
     required super.id,
     required super.name,
-    required super.photoUrl,
+    required super.photoData,
     required super.location,
     required super.city,
     required super.timestamp,
@@ -16,7 +16,7 @@ class PetModel extends Pet {
     return PetModel(
       id: id,
       name: json['name'],
-      photoUrl: json['photoUrl'],
+      photoData: (json['photoData'] as Blob).bytes,
       location: json['location'],
       city: json['city'],
       timestamp: (json['timestamp'] as Timestamp).toDate(),
@@ -25,7 +25,7 @@ class PetModel extends Pet {
 
   Map<String, dynamic> toJson() => {
     'name': name,
-    'photoUrl': photoUrl,
+    'photoData': Blob(photoData),
     'location': location,
     'city': city,
     'timestamp': Timestamp.fromDate(timestamp),

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:yandex_maps_mapkit/image.dart' as image;
+import 'package:yandex_maps_mapkit/mapkit.dart';
+import 'package:yandex_maps_mapkit/mapkit_factory.dart';
+import 'package:yandex_maps_mapkit/yandex_map.dart';
 
 import '../../domain/entities/Pet.dart';
 import '../blocs/pets_bloc.dart';
-import '../blocs/pets_event.dart';
 import '../blocs/pets_state.dart';
 
 class MapScreen extends StatelessWidget {
@@ -14,36 +16,32 @@ class MapScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (initialPet != null) {
-      context.read<PetsBloc>().add(LoadPetsEvent(city: initialPet!.city));
-    }
     return Scaffold(
       appBar: AppBar(title: const Text('Карта питомца')),
       body: BlocBuilder<PetsBloc, PetsState>(
         builder: (context, state) {
-          if (state is PetsLoading) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (state is PetsLoaded) {
-            final markers = state.pets.map(
-              (pet) => Marker(
-                markerId: MarkerId(pet.id),
-                position: LatLng(pet.location.latitude, pet.location.longitude),
-                infoWindow: InfoWindow(title: pet.name),
-                onTap:
-                    () => context.read<PetsBloc>().add(
-                      MarkSeenEvent(pet.id, pet.location),
-                    ),
-              ),
-            );
-            return GoogleMap(
-              initialCameraPosition: CameraPosition(
-                target: markers.first.position,
-                zoom: 12,
-              ),
-              markers: Set<Marker>.of(markers),
-            );
-          }
-          return const Center(child: Text('Нет данных'));
+          final imageProvider = image.ImageProvider.fromImageProvider(
+            const AssetImage("assets/ic_pin.png"),
+          );
+          return YandexMap(
+            onMapCreated: (mapWindow) async {
+              dynamic latitude = initialPet!.location.latitude;
+              dynamic longitude = initialPet!.location.longitude;
+              mapWindow.map.mapObjects.addPlacemark()
+                ..geometry = Point(latitude: latitude, longitude: longitude)
+                ..setIcon(imageProvider);
+
+              mapWindow.map.move(
+                CameraPosition(
+                  Point(latitude: latitude, longitude: longitude),
+                  zoom: 10,
+                  azimuth: 0,
+                  tilt: 0,
+                ),
+              );
+              mapkit.onStart();
+            },
+          );
         },
       ),
     );

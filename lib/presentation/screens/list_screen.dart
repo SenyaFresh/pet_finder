@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pet_finder/presentation/screens/upload_screen.dart';
 
 import '../blocs/pets_bloc.dart';
 import '../blocs/pets_event.dart';
@@ -24,9 +25,15 @@ class _ListScreenState extends State<ListScreen> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(16),
             child: TextField(
-              decoration: const InputDecoration(labelText: 'Город'),
+              decoration: InputDecoration(
+                labelText: 'Город',
+                prefixIcon: const Icon(Icons.location_city),
+                labelStyle: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
               onChanged: (v) {
                 _filter = v;
                 context.read<PetsBloc>().add(LoadPetsEvent(city: _filter));
@@ -38,8 +45,10 @@ class _ListScreenState extends State<ListScreen> {
               builder: (context, state) {
                 if (state is PetsLoading) {
                   return const Center(child: CircularProgressIndicator());
-                } else if (state is PetsLoaded) {
+                }
+                if (state is PetsLoaded) {
                   return ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
                     itemCount: state.pets.length,
                     itemBuilder:
                         (c, i) => PetCard(
@@ -55,7 +64,8 @@ class _ListScreenState extends State<ListScreen> {
                               ),
                         ),
                   );
-                } else if (state is PetsError) {
+                }
+                if (state is PetsError) {
                   return Center(child: Text(state.message));
                 }
                 return const SizedBox();
@@ -63,6 +73,14 @@ class _ListScreenState extends State<ListScreen> {
             ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed:
+            () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const UploadScreen()),
+            ),
+        child: const Icon(Icons.add),
       ),
     );
   }

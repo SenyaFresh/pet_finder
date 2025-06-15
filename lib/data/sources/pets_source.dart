@@ -9,8 +9,6 @@ abstract class PetsRemoteDataSource {
   Stream<List<PetModel>> streamPetsByCity(String city);
 
   Future<void> addPet(PetModel pet);
-
-  Future<void> markSeen(String petId, GeoPoint location);
 }
 
 class PetsRemoteDataSourceImpl implements PetsRemoteDataSource {
@@ -46,14 +44,5 @@ class PetsRemoteDataSourceImpl implements PetsRemoteDataSource {
   @override
   Future<void> addPet(PetModel pet) async {
     await _firestore.collection(Constants.petsCollection).add(pet.toJson());
-  }
-
-  @override
-  Future<void> markSeen(String petId, GeoPoint location) async {
-    await _firestore
-        .collection(Constants.petsCollection)
-        .doc(petId)
-        .collection(Constants.sightingsSubcollection)
-        .add({'location': location, 'timestamp': Timestamp.now()});
   }
 }

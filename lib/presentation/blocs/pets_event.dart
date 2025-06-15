@@ -15,10 +15,3 @@ class AddPetEvent extends PetsEvent {
 
   AddPetEvent(this.pet);
 }
-
-class MarkSeenEvent extends PetsEvent {
-  final String petId;
-  final GeoPoint location;
-
-  MarkSeenEvent(this.petId, this.location);
-}

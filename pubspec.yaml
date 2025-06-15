@@ -35,11 +35,10 @@ dependencies:
   bloc: ^9.0.0
   firebase_core: ^3.13.1
   cloud_firestore: ^5.6.8
-  firebase_storage: ^12.4.6
   image_picker: ^1.1.2
   geolocator: ^14.0.1
   flutter_bloc: ^9.1.1
-  google_maps_flutter: ^2.12.2
+  yandex_maps_mapkit: ^4.16.0-beta
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -66,6 +65,9 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  assets:
+    - assets/ic_pin.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:

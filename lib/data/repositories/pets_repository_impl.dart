@@ -19,14 +19,10 @@ class PetsRepositoryImpl implements PetsRepository {
     PetModel(
       id: pet.id,
       name: pet.name,
-      photoUrl: pet.photoUrl,
+      photoData: pet.photoData,
       location: pet.location,
       city: pet.city,
       timestamp: pet.timestamp,
     ),
   );
-
-  @override
-  Future<void> markSeen(String petId, dynamic location) async =>
-      remote.markSeen(petId, location);
 }

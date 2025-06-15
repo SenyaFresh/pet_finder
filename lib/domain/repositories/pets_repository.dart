@@ -6,6 +6,4 @@ abstract class PetsRepository {
   Stream<List<Pet>> getPetsByCity(String city);
 
   Future<void> addPet(Pet pet);
-
-  Future<void> markSeen(String petId, dynamic location);
 }

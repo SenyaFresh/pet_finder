@@ -1,7 +1,6 @@
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
@@ -20,27 +19,25 @@ class UploadScreen extends StatefulWidget {
 }
 
 class _UploadScreenState extends State<UploadScreen> {
-  File? _image;
+  Uint8List? _photoData;
   String? _name, _city;
   final _picker = ImagePicker();
 
   Future<void> _pickImage() async {
     final pick = await _picker.pickImage(source: ImageSource.gallery);
-    if (pick != null) setState(() => _image = File(pick.path));
+    if (pick != null) {
+      final bytes = await pick.readAsBytes();
+      setState(() => _photoData = bytes);
+    }
   }
 
   Future<void> _submit() async {
-    if (_image == null || _name == null || _city == null) return;
-    final storageRef = FirebaseStorage.instance.ref(
-      'pets/${DateTime.now().millisecondsSinceEpoch}.jpg',
-    );
-    final task = await storageRef.putFile(_image!);
-    final url = await task.ref.getDownloadURL();
+    if (_photoData == null || _name == null || _city == null) return;
     final pos = await Geolocator.getCurrentPosition();
     final pet = Pet(
       id: '',
       name: _name!,
-      photoUrl: url,
+      photoData: _photoData!,
       location: GeoPoint(pos.latitude, pos.longitude),
       city: _city!,
       timestamp: DateTime.now(),
@@ -60,18 +57,33 @@ class _UploadScreenState extends State<UploadScreen> {
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (_image != null) Image.file(_image!, height: 200),
-            ElevatedButton(onPressed: _pickImage, child: const Text('Фото')),
+            if (_photoData != null)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.memory(
+                  _photoData!,
+                  height: 200,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _pickImage,
+              child: const Text('Выбрать фото'),
+            ),
+            const SizedBox(height: 16),
             TextField(
               decoration: const InputDecoration(labelText: 'Кличка'),
               onChanged: (v) => _name = v,
             ),
+            const SizedBox(height: 16),
             TextField(
               decoration: const InputDecoration(labelText: 'Город'),
               onChanged: (v) => _city = v,
             ),
-            const SizedBox(height: 20),
+            const Spacer(),
             ElevatedButton(
               onPressed: _submit,
               child: const Text('Опубликовать'),
